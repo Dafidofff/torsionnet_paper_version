@@ -18,15 +18,17 @@ class BaseAgent:
         agent_name = self.__class__.__name__
         t0 = time.time()
 
-        while True:
-            if (config.save_interval != 0) and (self.total_steps % config.save_interval == 0):
-                self.save(f'data/{agent_name}-{config.tag}-{self.total_steps}')
+        for i in range(config.max_steps):
+            print(f"------------------ step: {i} --------------------- ")
+            # if (config.save_interval != 0) and (self.total_steps % config.save_interval == 0):
+            #     self.save(f'data/{agent_name}-{config.tag}-{self.total_steps}')
             if (config.eval_interval != 0) and (self.total_steps % config.eval_interval == 0):
                 self.eval_episodes()
             if (config.max_steps != 0) and (self.total_steps >= config.max_steps):
                 self.close()
                 break
             self.step()
+
 
     def close(self):
         self.task.close()

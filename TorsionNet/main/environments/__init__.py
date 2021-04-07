@@ -5,9 +5,12 @@ import inspect
 
 from . import graphenvironments
 from . import tchain_envs
-from .environment_wrapper import Task
+from .dummy_vec_env import DummyVecEnv
+from .environment_wrapper import Task, OriginalReturnWrapper
+
 
 clsmembers = inspect.getmembers(sys.modules['main.environments.graphenvironments'], inspect.isclass)
+
 for i, j in clsmembers:
      if issubclass(j, gym.Env):
           gym.envs.register(

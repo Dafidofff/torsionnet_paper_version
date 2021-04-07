@@ -8,6 +8,7 @@ import numpy as np
 import pickle
 import os
 import datetime
+import random
 import torch
 import time
 from pathlib import Path
@@ -19,8 +20,13 @@ def get_time_str():
     return datetime.datetime.now().strftime("%y%m%d-%H%M%S")
 
 def random_seed(seed=None):
-    np.random.seed(seed)
-    torch.manual_seed(np.random.randint(int(1e6)))
+    random.seed(seed)                                                            
+    torch.manual_seed(seed)                                                      
+    torch.cuda.manual_seed_all(seed)                                             
+    np.random.seed(seed)                                                         
+    os.environ['PYTHONHASHSEED'] = str(seed)                                     
+    torch.backends.cudnn.deterministic = True                                    
+    torch.backends.cudnn.benchmark = False 
 
 def set_one_thread():
     os.environ['OMP_NUM_THREADS'] = '1'

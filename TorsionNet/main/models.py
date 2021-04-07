@@ -9,6 +9,8 @@ import torch_geometric.nn as gnn
 import logging
 import numpy as np
 
+import sys
+
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 class CriticBatchNet(torch.nn.Module):
@@ -132,7 +134,8 @@ class RTGNBatch(torch.nn.Module):
     def forward(self, obs, states=None, action=None):
         data_list = []
         nr_list = []
-        for b, nr in obs:
+
+        for i, (b, nr) in enumerate(obs):
             data_list += b.to_data_list()
             nr_list.append(torch.LongTensor(nr))
 
@@ -168,7 +171,6 @@ class RTGNBatch(torch.nn.Module):
         dist = torch.distributions.Categorical(logits=logits)
         if action == None:
             action = dist.sample()
-
         action = action.to(device)
 
         try:

@@ -18,8 +18,9 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 class PPORecurrentAgent(BaseAgent):
     def __init__(self, config):
         BaseAgent.__init__(self, config)
-        self.config = config #config file, contains hyperparameters and other info
-        self.task = config.train_env #gym environment wrapper
+
+        self.config = config                    # config file, contains hyperparameters and other info
+        self.task = config.train_env            # gym environment wrapper
         self.hidden_size = config.hidden_size
 
         self.network = config.network
@@ -82,7 +83,7 @@ class PPORecurrentAgent(BaseAgent):
         states = self.states
 
         ##############################################################################################
-        #Sampling Loop
+        # Sampling Loop
         ##############################################################################################
         with torch.no_grad():
             for _ in range(config.rollout_length):
@@ -125,7 +126,7 @@ class PPORecurrentAgent(BaseAgent):
                     states_mem[i].append(states[i])
                 states = next_states
 
-                #zero out lstm recurrent state if any of the environments finish
+                # zero out lstm recurrent state if any of the environments finish
                 for i, done in enumerate(terminals):
                     if done:
                         self.hp[0][i] = torch.zeros(self.hidden_size).to(device)
@@ -140,15 +141,18 @@ class PPORecurrentAgent(BaseAgent):
                         self.reward_buffer.append(ifs['episodic_return'])
 
             if self.curr is not None:
+
                 if len(self.reward_buffer) >= self.curr.min_length + config.num_workers:
                     rewbuf = np.array(self.reward_buffer)[-1 * self.curr.min_length:]
                     conds = rewbuf > self.curr.win_cond
 
                     if conds.mean() > self.curr.success_percent:
+                        print("success")
                         self.task.env_method('change_level', True)
                         self.reward_buffer.clear()
 
                     if conds.mean() < self.curr.fail_percent:
+                        print("Not success")
                         self.task.env_method('change_level', False)
                         self.reward_buffer.clear()
 
@@ -166,7 +170,7 @@ class PPORecurrentAgent(BaseAgent):
 
 
         #############################################################################################
-        #Calculate advantages and returns and set up for training
+        # Calculate advantages and returns and set up for training
         #############################################################################################
 
         advantages = tensor(np.zeros((config.num_workers, 1))).to(device)
@@ -205,6 +209,7 @@ class PPORecurrentAgent(BaseAgent):
         advantages = (advantages - advantages.mean()) / advantages.std()
 
         self.writer.add_scalar('advantages', advantages.mean(), self.total_steps)
+        self.writer.add_scalar('rewards', rewards.mean(), self.total_steps)
 
         states = []
         for block in states_mem:

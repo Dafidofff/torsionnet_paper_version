@@ -24,10 +24,11 @@ class Curriculum():
 
 def ppo_feature(env_name, args, **kwargs):
     config = Config()
-    config.tag=tag
+    config.tag = tag
     config.env_name = env_name
 
-    config.num_workers = 35
+    # config.num_workers = 35
+    config.num_workers = 1
     single_process = (config.num_workers == 1)
     config.linear_lr_scale = False
 
@@ -38,7 +39,7 @@ def ppo_feature(env_name, args, **kwargs):
     else:
         lr = base_lr * np.sqrt(config.num_workers)
 
-    config.curriculum = Curriculum(min_length=config.num_workers)
+    config.curriculum = Curriculum(win_cond=0.1, success_percent=0.1, min_length=config.num_workers)
 
     config.train_env = Task(env_name, num_envs=config.num_workers, seed=random.randint(0,1e5), single_process=single_process)
 
@@ -61,6 +62,7 @@ def ppo_feature(env_name, args, **kwargs):
     config.eval_interval = config.num_workers * 1000 * 2
     config.eval_episodes = 1
     config.eval_env = Task('LigninPruningSkeletonValidationLong-v0', seed=random.randint(0,7e4))
+
     return PPORecurrentAgent(config)
 
 
@@ -68,7 +70,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Run batch training')
 
     parser.add_argument('-lr', '--learning_rate', type=float)
-
     parser.add_argument('-s', '--starter')
 
     args = parser.parse_args()
@@ -77,6 +78,7 @@ if __name__ == '__main__':
     mkdir('tf_log')
     mkdir('data')
     
+    random_seed(4)
     model = RTGNBatch(6, 128, edge_dim=6, point_dim=5)
     
     if args.starter:
@@ -92,4 +94,5 @@ if __name__ == '__main__':
     agent = ppo_feature(env_name, args, tag=tag)
     logging.info(env_name)
     logging.info(tag)
+
     agent.run_steps()

@@ -1,0 +1,23 @@
+I tested RDKit
+Maximum number of conformers should be 27
+Number starting conformers             Unique conformers (less strict GO convergence)
+                        18                            10 (10)
+                        27                            11 (11)
+                        54                            14 (15)
+                       100                            15 (15)
+                       200                            18 (19)
+                      1000                            19 (25)
+                     10000                            22 (62)
+
+I also tested enumeration, and the number of conformers created with different angles
+Angle rotation of torsion  (  max)     Unique conformers (less strict GO convergence)
+                       120 (   27)                    19 ( 20)
+                        60 (  216)                    22 ( 47)
+                        30 ( 1728)                    26 ( 81)
+                        15 (13824)                    44 (154)
+
+# The set that should compare best with the other reference sets : Confs10000
+
+I also tested our implementation of CREST
+CrestAMS                                              24
+CrestGrimme                                           20

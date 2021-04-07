@@ -33,8 +33,11 @@ class OriginalReturnWrapper(gym.Wrapper):
 
 def make_env(env_id, seed, rank, episode_life=True):
     def _thunk():
-        random_seed(seed + rank)
+
+        # random_seed(seed + rank)
+
         env = gym.make(env_id)
+        env.seed(4)
         env = OriginalReturnWrapper(env)
         return env
 
@@ -51,10 +54,11 @@ class Task:
                  seed=np.random.randint(int(1e5))):
         if log_dir is not None:
             mkdir(log_dir)
-
+        
         logging.info(f'seed is {seed}')
 
         envs = [make_env(name, seed, i, episode_life) for i in range(num_envs)]
+
         if single_process:
             Wrapper = DummyVecEnv
             self.env = DummyVecEnv(envs)
