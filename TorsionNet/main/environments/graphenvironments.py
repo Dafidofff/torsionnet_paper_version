@@ -550,8 +550,7 @@ class UniqueSetGibbs(SetGibbs):
         self.seen.add(tuple(self.action))
         current = confgen.get_conformer_energies(self.mol)[0]
         current = current * self.temp_normal
-        print('standard', self.standard_energy)
-        print('current', current)
+        # print('current', current)
 
         rew = np.exp(-1.0 * (current - self.standard_energy)) / self.total
 
@@ -567,9 +566,10 @@ class UniqueSetGibbs(SetGibbs):
         after_total = np.exp(-1.0 * (confgen.get_conformer_energies(self.backup_mol) - self.standard_energy)).sum()
         after_conformers = self.backup_mol.GetNumConformers()
         diff = before_total - after_total
-        print('diff is ', diff)
-        print(f'pruned {after_conformers - before_conformers} conformers')
-        print(f'pruning thresh is {self.pruning_thresh}')
+        
+        # print('diff is ', diff)
+        # print(f'pruned {after_conformers - before_conformers} conformers')
+        # print(f'pruning thresh is {self.pruning_thresh}')
         return diff / self.total
 
     def mol_appends(self):
@@ -596,12 +596,10 @@ class PruningSetGibbs(SetGibbs):
         self.seen.add(tuple(self.action))
         current = confgen.get_conformer_energies(self.mol)[0]
         current = current * self.temp_normal
-        print('standard', self.standard_energy)
-        print('current', current)
+        # print('current', current)
 
         rew = np.exp(-1.0 * (current - self.standard_energy)) / self.total
 
-        print('current step', self.current_step)
         if self.current_step > 1:
             rew -= self.done_neg_reward(current)
 
